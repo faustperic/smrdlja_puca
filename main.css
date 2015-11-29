@@ -1,0 +1,14 @@
+.demo iframe {
+	border: 0;
+	overflow: hidden;
+}	
+
+.demo pre {
+	max-height: 400px;
+	overflow: auto;
+}
+
+#body
+{
+  background: midnightblue;
+}
