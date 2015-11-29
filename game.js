@@ -4,8 +4,8 @@ var GameState=
 {
 	preload:function()
 	{
-		this.load.image('bacground','smrdlja_puca/Nautilus.png');
-		this.load.image('spacer','smrdlja_puca/Spacer.png');
+		this.load.image('bacground','Nautilus.png');
+		this.load.image('spacer','Spacer.png');
 	},
 	create: function()
 	{
