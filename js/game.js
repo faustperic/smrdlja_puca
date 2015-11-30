@@ -10,6 +10,7 @@ var GameState=
 	},
 	create: function()
 	{
+		this.game.physics.startSystem(Phaser.Physics.ARCADE);
 		this.background1=this.game.add.sprite(0,0,'bacground');
 		this.background1.scale.setTo(1);
 		this.background2=this.game.add.sprite(0,-this.background1.height,'bacground');
@@ -17,15 +18,17 @@ var GameState=
 		this.background2right=this.game.add.sprite(this.background1.width,-this.background1.height,'bacground');
 		this.pepa=5;
 		this.spacer=this.game.add.sprite(this.game.world.centerX,this.game.world.centerY,'spacer');
+		//enableing physics
+		this.game.physics.arcade.enableBody(this.spacer);
 		this.spacer.anchor.setTo(0.5);
 		this.spacer.scale.setTo(1);
 		this.background2.scale.setTo(1);
 		this.cursors = game.input;
 		this.enemies=[];
 		var i=0;
-		for(i=0; i<10;i++)
+		for(i=0; i<50;i++)
 		{
-			this.enemies.push(new Raider(this.game,this.game.world.centerX+100*Math.sin(i),this.game.world.centerY+i*100));
+			this.enemies.push(new Raider(this.game,this.spacer,this.game.world.centerX+200*Math.sin(i*5),this.game.world.centerY+i*100));
 		}
 	},
 	update:function()
@@ -53,5 +56,10 @@ var GameState=
 	}
 }
 
+//function if colide 2 kill 2
+function colide2(first,second){
+	first.kill();
+	second.kill();
+}
 game.state.add('GameState',GameState);
 game.state.start('GameState');
