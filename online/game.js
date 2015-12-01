@@ -4,7 +4,7 @@ var GameState=
 {
 	preload:function()
 	{
-		this.load.image('bacground','Nautilus.png');
+		this.load.image('bacground','background.png');
 		this.load.image('spacer','Spacer.png');
 	},
 	create: function()
