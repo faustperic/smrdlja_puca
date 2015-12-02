@@ -4,11 +4,12 @@ var bullets;
 var bulletTime = 0;
 var fireButton;
 var spacer;
+var pomGame;
 var GameState=
 {
 	preload:function()
 	{
-		this.load.image('bacground','texture/Nautilus.png');
+		this.load.image('bacground','texture/background.png');
 		this.load.image('spacer','texture/Spacer.png');
 		this.load.image('raider','texture/Raider-256K.png');
 		game.load.spritesheet('kaboom', 'texture/explode.png', 128, 128);
@@ -17,29 +18,20 @@ var GameState=
 	create: function()
 	{
 		//  Our bullet group
-    	bullets = game.add.group();
-    	bullets.enableBody = true;
-    	bullets.physicsBodyType = Phaser.Physics.ARCADE;
-    	bullets.createMultiple(30, 'bullet');
-    	bullets.setAll('anchor.x', 0.5);
-    	bullets.setAll('anchor.y', 1);
-    	bullets.setAll('outOfBoundsKill', true);
-    	bullets.setAll('checkWorldBounds', true);
-		
 		this.game.physics.startSystem(Phaser.Physics.ARCADE);
+    	
+		pomGame=this;
+		
 		this.background1=this.game.add.sprite(0,0,'bacground');
 		this.background1.scale.setTo(1);
 		this.background2=this.game.add.sprite(0,-this.background1.height,'bacground');
 		this.background1right=this.game.add.sprite(this.background1.width,0,'bacground');
 		this.background2right=this.game.add.sprite(this.background1.width,-this.background1.height,'bacground');
 		this.pepa=5;
-		spacer=this.game.add.sprite(this.game.world.centerX,this.game.world.centerY,'spacer');
+		spacer=new Spacer(this,'spacer',this.game.world.centerX,this.game.world.centerY);
+		
 		//enableing physics
-		this.game.physics.arcade.enableBody(spacer);
-		spacer.anchor.setTo(0.5);
-		spacer.scale.setTo(1);
-		this.background2.scale.setTo(1);
-		this.cursors = game.input;
+		
 		this.enemies=[];
 		var i=0;
 		for(i=0; i<50;i++)
@@ -51,7 +43,17 @@ var GameState=
     	explosions.createMultiple(30, 'kaboom');
     	explosions.forEach(setupInvader, this);
 		
-		fireButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+		bullets = game.add.group();
+    	bullets.enableBody = true;
+		bullets.forEach(function(el){this.game.physics.arcade.enableBody(el);},this);
+    	bullets.physicsBodyType = Phaser.Physics.ARCADE;
+    	bullets.createMultiple(30, 'bullet');
+    	bullets.setAll('anchor.x', 0.5);
+    	bullets.setAll('anchor.y', 1);
+    	bullets.setAll('outOfBoundsKill', true);
+    	bullets.setAll('checkWorldBounds', true);
+		
+		
 	},
 	update:function()
 	{
@@ -59,12 +61,8 @@ var GameState=
 		this.enemies.forEach(function(element) {
 			element.update(this.pepa);
 		}, this);
-		var target={x:this.cursors.x-spacer.position.x,y:this.cursors.y-spacer.position.y};
-		var len=Math.sqrt(target.x*target.x+target.y*target.y)/5;
-		if(len>1){
-			spacer.position.x+=target.x/len;
-			spacer.position.y+=target.y/len;
-		}
+		spacer.update();
+
 		this.background1.position.y+=.5;
 		
 		if(this.background1.position.y>1*this.background1.height){
@@ -77,13 +75,18 @@ var GameState=
 		this.background2right.position.y=this.background2.position.y;
 		
 		//  Firing?
-        if (fireButton.isDown)
+       /* if (fireButton.isDown)
         {
             fireBullet();
         }
-
+*/
         //  Run collision
-        game.physics.arcade.overlap(bullets, this.enemies, collisionHandler, null, this);
+		this.enemies.forEach(function(enemy) {
+				this.game.physics.arcade.overlap(spacer.bullets, enemy.render, collisionHandler, null, this);
+				this.game.physics.arcade.overlap(spacer.render, enemy.render, colide2, null, this);
+				this.game.physics.arcade.overlap(enemy.bullets, spacer.render, colide2, null, this);
+		}, this);
+        
 	}
 }
 
@@ -109,13 +112,15 @@ function fireBullet () {
     if (game.time.now > bulletTime)
     {
         //  Grab the first bullet we can from the pool
-        var bullet = bullets.getFirstExists(false);
+        var bullet = bullets.getFirstDead();;
 
         if (bullet)
         {
             //  And fire it
 			console.debug("metak je ispaljeeen! " + spacer.x +"  "+ spacer.y + 8);
             bullet.reset(spacer.x, spacer.y + 8);
+			
+			//pomGame.game.physics.arcade.enableBody(bullet);
             bullet.body.velocity.y = -400;
             bulletTime = game.time.now + 200;
         }
