@@ -36,7 +36,7 @@ Spacer.prototype.update = function(posy)
 		spacer.position.x+=target.x/len;
 		spacer.position.y+=target.y/len;
 	}
-	
+	if(this.cursors.activePointer.isDown)this.fire();
 	if(this.fireButton.isDown) this.fire();
 }
 Spacer.prototype.fire = function() {
